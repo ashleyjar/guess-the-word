@@ -1,2 +1,2 @@
 # guess-the-word
-Word guessing game made with Python
+WIP: Word guessing game made with Python
