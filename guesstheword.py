@@ -162,71 +162,83 @@ myDictionary = ["afternoon",
 "zebra",
 "zipper"]
 
+class Game:
+  def __init__(self, word):
+    self.word = word
+    self.letters = list(self.word)
+    self.blanks = ["_"] * len(self.letters)
+    self.wrong = []
+    
+  def reset(self, word):
+    self.word = word
+    self.letters = list(self.word)
+    self.blanks = ["_"] * len(self.letters)
+    self.wrong = []
+
 def show_board():
-  print("\n%s # of bad guesses left: %d" % ('{0: <35}'.format("Already guessed: %s" % " ".join(wrong)), 8-len(wrong)))
-  print("Word: %s" % " ".join(blanks))
+  print("\n%s # of bad guesses left: %d" % ('{0: <35}'.format("Already guessed: %s" % " ".join(g.wrong)), 8-len(g.wrong)))
+  print("Word: %s" % " ".join(g.blanks))
 
 def take_a_guess():
   show_board()
   guess = input('\n')  
   if not re.fullmatch('[a-zA-Z]', guess): 
-    if guess == word:
-      for index in range(len(letters)):   
-        blanks[index] = letters[index]
+    if guess == g.word:
+      for index in range(len(g.letters)):   
+        g.blanks[index] = g.letters[index]
       show_board()
-      play_again("\nYou win! Play again? Y/N")
+      play_again("\nYou win! Play again? Y/N: ")
     else:
       if len(guess)==1:
-        print("Guesses must be a letter.")
+        print("Guesses must be a letter or word.")
       else:
         print("No, that's not the word.")
       
       take_a_guess()
   else: 
-    if guess in wrong or guess in blanks:
+    if guess in g.wrong or guess in g.blanks:
       print("You already guessed letter %s." % guess)
       take_a_guess()
     else:
-      matches = [index for index, letter in enumerate(letters) if letter == guess]
+      matches = [index for index, letter in enumerate(g.letters) if letter == guess]
   
       if not matches:
-        wrong.append(guess)
+        g.wrong.append(guess)
    
-        if len(wrong) == 8:
-          play_again("\nYou lose! The word was: %s Play again? Y/N" % word)
+        if len(g.wrong) == 8:
+          play_again("\nYou lose! The word was: %s. Play again? Y/N: " % g.word)
         else:
           take_a_guess()
       else:
         for match in matches:
-          blanks[match] = guess
+          g.blanks[match] = guess
  
-        if blanks.count("_") == 0:
+        if g.blanks.count("_") == 0:
           show_board()
-          play_again("\nYou win! Play again? Y/N")
+          play_again("\nYou win! Play again? Y/N: ")
         else:
           take_a_guess()
 
 def play_again(message):
   again = input(message)
   if again == "y" or again == "Y":
-    global word 
-    word = random.choice(myDictionary)
-    myDictionary.remove(word)
-    global letters
-    letters = list(word)
-    global blanks 
-    blanks = ["_"] * len(letters)
-    global wrong
-    wrong = []
-    take_a_guess()
+    if not myDictionary:
+      print("\nYou guessed all the words. Goodbye!")
+    else:
+     g.reset(random.choice(myDictionary))
+     myDictionary.remove(g.word)
+     take_a_guess()
   else:
     print("\nGoodbye!")
   
           
-word = random.choice(myDictionary)
-myDictionary.remove(word)
-letters = list(word)
-blanks = ["_"] * len(letters)
-wrong = []
-print("\nTry and guess the letters in the word below. \nTo make a guess click any letter and press enter. \nIf you make eight bad guesses you lose. \nType the word if you think you know it. \nA wrong answer won't count against you.")
+
+g = Game(random.choice(myDictionary))
+myDictionary.remove(g.word)
+
+print("\nTry and guess the letters in the word below."
+      "\nTo make a guess click any letter and press enter."
+      "\nIf you make eight bad guesses you lose." 
+      "\nType the word if you think you know it." 
+      "\nA wrong answer won't count against you.")
 take_a_guess()
